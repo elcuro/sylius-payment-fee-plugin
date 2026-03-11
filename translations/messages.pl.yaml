@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    ui:
+        payment_charges: Opłaty za płatność
+        payment_fee_total: Opłaty za płatność łącznie
+    form:
+        payment_method:
+            calculator: Kalkulator
+        calculator:
+            flat_rate:
+                label: Stawka ryczałtowa
+                amount: Kwota
+            free:
+                label: Bezpłatnie

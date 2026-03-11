@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    ui:
+        payment_charges: Zahlungsgebühren
+        payment_fee_total: Zahlungsgebühren gesamt
+    form:
+        payment_method:
+            calculator: Kalkulator
+        calculator:
+            flat_rate:
+                label: Pauschale
+                amount: Betrag
+            free:
+                label: Kostenlos

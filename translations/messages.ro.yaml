@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    ui:
+        payment_charges: Taxe de plată
+        payment_fee_total: Total taxe de plată
+    form:
+        payment_method:
+            calculator: Calculator
+        calculator:
+            flat_rate:
+                label: Tarif fix
+                amount: Sumă
+            free:
+                label: Gratuit

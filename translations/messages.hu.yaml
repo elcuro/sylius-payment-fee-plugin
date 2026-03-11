@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    ui:
+        payment_charges: Fizetési díjak
+        payment_fee_total: Fizetési díjak összesen
+    form:
+        payment_method:
+            calculator: Kalkulátor
+        calculator:
+            flat_rate:
+                label: Átalánydíj
+                amount: Összeg
+            free:
+                label: Ingyenes
