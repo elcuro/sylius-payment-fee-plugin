@@ -1,129 +1,104 @@
-<p align="center">
-    <a href="https://sylius.com" target="_blank">
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="https://media.sylius.com/sylius-logo-800-dark.png">
-          <source media="(prefers-color-scheme: light)" srcset="https://media.sylius.com/sylius-logo-800.png">
-          <img alt="Sylius Logo." src="https://media.sylius.com/sylius-logo-800.png">
-        </picture>
-    </a>
-</p>
+# Sylius Payment Fee Plugin
 
-<h1 align="center">Plugin Skeleton</h1>
+Payment method fee plugin for Sylius 2.0. Adds configurable fees to payment methods — displayed during checkout and applied as order adjustments with tax support.
 
-<p align="center">Skeleton for starting Sylius plugins.</p>
+## Features
 
-## Documentation
+- **Fee Calculators**: Flat rate (per-channel configuration) and free calculator, with support for custom calculators
+- **Per-channel configuration**: Different fee amounts for each sales channel
+- **Tax support**: Assign tax categories to payment fees
+- **Admin UI**: Calculator selection and configuration on Payment Method edit page, fee display on order detail
+- **Shop UI**: Payment fee displayed during checkout
 
-For a comprehensive guide on Sylius Plugins development please go to Sylius documentation,
-there you will find the <a href="https://docs.sylius.com/plugins-development-guide/how-to-create-a-plugin-for-sylius">Plugin Development Guide</a> - it's a great place to start.
+## Requirements
 
-For more information about the **Test Application** included in the skeleton, please refer to the [Sylius documentation](https://docs.sylius.com/plugins-development-guide/test-application).
+- PHP ^8.2
+- Sylius ^2.0
 
-## Quickstart Installation
+## Installation
 
-Run `composer create-project sylius/plugin-skeleton ProjectName`.
-
-### Traditional
-
-1. From the plugin skeleton root directory, run the following commands:
+1. Install the plugin via Composer:
 
     ```bash
-    (cd vendor/sylius/test-application && yarn install)
-    (cd vendor/sylius/test-application && yarn build)
-    vendor/bin/console assets:install
-   
-    vendor/bin/console doctrine:database:create
-    vendor/bin/console doctrine:migrations:migrate -n
-    # Optionally load data fixtures
-    vendor/bin/console sylius:fixtures:load -n
+    composer require elcuro/sylius-payment-fee-plugin
     ```
 
-To be able to set up a plugin's database, remember to configure your database credentials in `tests/TestApplication/.env` and `tests/TestApplication/.env.test`.
+2. Register the bundle in `config/bundles.php` (if not auto-registered):
 
-2. Run your local server:
+    ```php
+    return [
+        // ...
+        Elcuro\SyliusPaymentFeePlugin\ElcuroSyliusPaymentFeePlugin::class => ['all' => true],
+    ];
+    ```
 
-      ```bash
-      symfony server:ca:install
-      symfony server:start -d
-      ```
-
-3. Open your browser and navigate to `https://localhost:8000`.
-
-### Docker
-
-1. Execute `make init` to initialize the container and install the dependencies.
-
-2. Execute `make database-init` to create the database and run migrations.
-
-3. (Optional) Execute `make load-fixtures` to load the fixtures.
-
-4. Your app is available at `http://localhost`.
-
-## Usage
-
-### Running plugin tests
-
-  - PHPUnit
+3. Run the database migration:
 
     ```bash
-    vendor/bin/phpunit
+    bin/console doctrine:migrations:migrate -n
     ```
 
-  - Behat (non-JS scenarios)
+4. Extend your `PaymentMethod` entity with the fee trait:
 
-    ```bash
-    vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"
+    ```php
+    use Elcuro\SyliusPaymentFeePlugin\Model\PaymentMethodWithFeeInterface;
+    use Elcuro\SyliusPaymentFeePlugin\Model\PaymentMethodWithFeeTrait;
+
+    class PaymentMethod extends BasePaymentMethod implements PaymentMethodWithFeeInterface
+    {
+        use PaymentMethodWithFeeTrait;
+    }
     ```
 
-  - Behat (JS scenarios)
- 
-    1. [Install Symfony CLI command](https://symfony.com/download).
- 
-    2. Start Headless Chrome:
-    
-      ```bash
-      google-chrome-stable --enable-automation --disable-background-networking --no-default-browser-check --no-first-run --disable-popup-blocking --disable-default-apps --allow-insecure-localhost --disable-translate --disable-extensions --no-sandbox --enable-features=Metal --headless --remote-debugging-port=9222 --window-size=2880,1800 --proxy-server='direct://' --proxy-bypass-list='*' http://127.0.0.1
-      ```
-    
-    3. Install SSL certificates (only once needed) and run test application's webserver on `127.0.0.1:8080`:
-    
-      ```bash
-      symfony server:ca:install
-      APP_ENV=test symfony server:start --port=8080 --daemon
-      ```
-    
-    4. Run Behat:
-    
-      ```bash
-      vendor/bin/behat --strict --tags="@javascript,@mink:chromedriver"
-      ```
-    
-  - Static Analysis
-      
-    - PHPStan
-    
-      ```bash
-      vendor/bin/phpstan analyse -c phpstan.neon -l max src/  
-      ```
+## Configuration
 
-  - Coding Standard
-  
-    ```bash
-    vendor/bin/ecs check
-    ```
+Go to **Admin > Configuration > Payment Methods**, edit a payment method, and select a fee calculator:
 
-### Opening Sylius with your plugin
+- **Free** — no fee (default)
+- **Flat Rate** — fixed fee amount per channel
 
-- Using `test` environment:
+Optionally assign a **Tax Category** to apply tax on the payment fee.
 
-    ```bash
-    APP_ENV=test vendor/bin/console sylius:fixtures:load -n
-    APP_ENV=test symfony server:start -d
-    ```
-    
-- Using `dev` environment:
+## Development
 
-    ```bash
-    vendor/bin/console sylius:fixtures:load -n
-    symfony server:start -d
-    ```
+### DDEV Environment
+
+```bash
+ddev start                    # Start containers
+ddev ssh                      # Shell into web container
+ddev composer install         # Install dependencies
+```
+
+### Database
+
+```bash
+vendor/bin/console doctrine:database:create
+vendor/bin/console doctrine:migrations:migrate -n
+vendor/bin/console sylius:fixtures:load -n
+composer run database-reset   # Drop + create + migrate + fixtures
+```
+
+### Frontend
+
+```bash
+(cd vendor/sylius/test-application && yarn install && yarn build)
+vendor/bin/console assets:install
+```
+
+### Testing
+
+```bash
+vendor/bin/phpunit                                                    # PHPUnit
+vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"  # Behat (non-JS)
+```
+
+### Code Quality
+
+```bash
+vendor/bin/phpstan analyse -c phpstan.neon -l max src/   # Static analysis
+vendor/bin/ecs check                                      # Coding standards
+```
+
+## License
+
+MIT. See [LICENSE](LICENSE).
