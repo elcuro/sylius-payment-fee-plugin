@@ -1,0 +1,16 @@
+sylius_twig_hooks:
+    hooks:
+        'sylius_admin.payment_method.create.content.form.sections':
+            payment_fee:
+                template: '@ElcuroSyliusPaymentFeePlugin/admin/payment_method/form/sections/payment_fee.html.twig'
+                priority: 50
+
+        'sylius_admin.payment_method.update.content.form.sections':
+            payment_fee:
+                template: '@ElcuroSyliusPaymentFeePlugin/admin/payment_method/form/sections/payment_fee.html.twig'
+                priority: 50
+
+        'sylius_admin.order.show.content.sections.summary':
+            payment_fee_total:
+                template: '@ElcuroSyliusPaymentFeePlugin/admin/order/show/content/sections/summary/payment_fee_total.html.twig'
+                priority: 90

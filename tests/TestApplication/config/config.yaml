@@ -1,0 +1,24 @@
+imports:
+    - { resource: "@ElcuroSyliusPaymentFeePlugin/config/config.yaml" }
+    - { resource: "services_test.php" }
+
+twig:
+    paths:
+        '%kernel.project_dir%/../../../tests/TestApplication/templates': ~
+
+sylius_payment:
+    resources:
+        payment_method:
+            classes:
+                model: Tests\Elcuro\SyliusPaymentFeePlugin\Entity\PaymentMethod
+
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    TestApplication:
+                        is_bundle: false
+                        type: attribute
+                        dir: '%kernel.project_dir%/../../../tests/TestApplication/src/Entity'
+                        prefix: Tests\Elcuro\SyliusPaymentFeePlugin\Entity

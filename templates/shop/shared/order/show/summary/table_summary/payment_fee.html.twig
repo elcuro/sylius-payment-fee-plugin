@@ -1,0 +1,7 @@
+{% set order = hookable_metadata.context.order %}
+{% set payment_adjustment = constant('Elcuro\\SyliusPaymentFeePlugin\\Model\\AdjustmentInterface::PAYMENT_ADJUSTMENT') %}
+{% if order.getAdjustmentsTotal(payment_adjustment) != 0 %}
+<tr>
+    {% hook 'payment_fee' %}
+</tr>
+{% endif %}

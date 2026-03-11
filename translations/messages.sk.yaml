@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    ui:
+        payment_charges: Poplatky za platbu
+        payment_fee_total: Poplatky za platbu celkom
+    form:
+        payment_method:
+            calculator: Kalkulátor
+        calculator:
+            flat_rate:
+                label: Paušálna sadzba
+                amount: Suma
+            free:
+                label: Zadarmo

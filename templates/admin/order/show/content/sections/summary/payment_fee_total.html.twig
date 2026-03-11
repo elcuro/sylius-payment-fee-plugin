@@ -1,0 +1,11 @@
+{% import '@SyliusAdmin/shared/helper/money.html.twig' as money %}
+
+{% set payment_adjustment = constant('Elcuro\\SyliusPaymentFeePlugin\\Model\\AdjustmentInterface::PAYMENT_ADJUSTMENT') %}
+{% set order = hookable_metadata.context.resource %}
+
+{% if order.getAdjustmentsTotal(payment_adjustment) != 0 %}
+<tr>
+    <td><strong>{{ 'elcuro_sylius_payment_fee.ui.payment_fee_total'|trans }}:</strong></td>
+    <td class="text-end" {{ sylius_test_html_attribute('payment-fee-total') }}>{{ money.format(order.getAdjustmentsTotal(payment_adjustment), order.currencyCode) }}</td>
+</tr>
+{% endif %}

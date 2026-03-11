@@ -1,0 +1,56 @@
+{% set form = hookable_metadata.context.form %}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <div class="card-title">{{ 'elcuro_sylius_payment_fee.ui.payment_charges'|trans }}</div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12 col-md-6">
+                {{ form_row(form.taxCategory) }}
+            </div>
+            <div class="col-12 col-md-6">
+                {{ form_row(form.calculator) }}
+            </div>
+        </div>
+
+        {% for name, calculatorConfigurationPrototype in form.vars.prototypes %}
+            <div id="{{ form.calculator.vars.id }}_{{ name }}"
+                 data-container=".calculator-configuration"
+                 data-prototype="{{ form_widget(calculatorConfigurationPrototype)|e('html_attr') }}"
+                 style="display: none;">
+            </div>
+        {% endfor %}
+
+        <div class="calculator-configuration">
+            {% if form.calculatorConfiguration is defined %}
+                {% for field in form.calculatorConfiguration %}
+                    {{ form_row(field) }}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calculatorSelect = document.getElementById('{{ form.calculator.vars.id }}');
+        if (!calculatorSelect) return;
+
+        function updateCalculatorConfiguration() {
+            const configContainer = document.querySelector('.calculator-configuration');
+            configContainer.innerHTML = '';
+
+            const selectedCalculator = calculatorSelect.value;
+            if (!selectedCalculator) return;
+
+            const prototypeElement = document.getElementById(calculatorSelect.id + '_calculators_' + selectedCalculator);
+            if (!prototypeElement) return;
+
+            configContainer.innerHTML = prototypeElement.dataset.prototype;
+        }
+
+        calculatorSelect.addEventListener('change', updateCalculatorConfiguration);
+    });
+</script>

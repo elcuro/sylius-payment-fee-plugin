@@ -1,17 +1,21 @@
-
 /vendor/
+/var/
 /node_modules/
+/drivers/
 /composer.lock
 
 /etc/build/*
-!/etc/build/.gitkeep
+!/etc/build/.gitignore
 
-/tests/Application/yarn.lock
+/.phpunit.result.cache
+/behat.yml
+/phpunit.xml
+/compose.override.yml
+.phpunit.result.cache
 
-docker-compose.override.yaml
-docker-compose.override.dist.yaml
-docker-compose.yaml
-/bin-docker/
-/deploy/
-/docker/
-/etc/
+# Symfony CLI https://symfony.com/doc/current/setup/symfony_server.html#different-php-settings-per-project
+/.php-version
+/php.ini
+
+/tests/TestApplication/.env.local
+/tests/TestApplication/.env.*.local

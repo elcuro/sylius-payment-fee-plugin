@@ -1,108 +1,129 @@
 <p align="center">
-    <a href="https://www.mangoweb.cz/en/" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/38423357?s=200&v=4"/>
+    <a href="https://sylius.com" target="_blank">
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcset="https://media.sylius.com/sylius-logo-800-dark.png">
+          <source media="(prefers-color-scheme: light)" srcset="https://media.sylius.com/sylius-logo-800.png">
+          <img alt="Sylius Logo." src="https://media.sylius.com/sylius-logo-800.png">
+        </picture>
     </a>
 </p>
-<h1 align="center">Payment Fee Plugin</h1>
 
-## Features
+<h1 align="center">Plugin Skeleton</h1>
 
-* Charge extra fee for using payment method.
-* Typical usage: Cash on Delivery.
-* Taxes are implemented the same way as taxes for shipping fees.
+<p align="center">Skeleton for starting Sylius plugins.</p>
 
-<p align="center">
-	<img src="https://raw.githubusercontent.com/mangoweb-sylius/SyliusPaymentFeePlugin/master/doc/admin.png"/>
-</p>
+## Documentation
 
-## Installation
+For a comprehensive guide on Sylius Plugins development please go to Sylius documentation,
+there you will find the <a href="https://docs.sylius.com/plugins-development-guide/how-to-create-a-plugin-for-sylius">Plugin Development Guide</a> - it's a great place to start.
 
-1. Run `$ composer require mangoweb-sylius/sylius-payment-fee-plugin`.
-2. Register `\MangoSylius\PaymentFeePlugin\MangoSyliusPaymentFeePlugin` in your Kernel.
-3. Your Entity `PaymentMethod` has to implement `\MangoSylius\PaymentFeePlugin\Model\PaymentMethodWithFeeInterface`. You can use Trait `MangoSylius\PaymentFeePlugin\Model\PaymentMethodWithFeeTrait`. 
+For more information about the **Test Application** included in the skeleton, please refer to the [Sylius documentation](https://docs.sylius.com/plugins-development-guide/test-application).
 
-For guide how to use your own entity see [Sylius docs - Customizing Models](https://docs.sylius.com/en/1.3/customization/model.html)
+## Quickstart Installation
 
-### Admin
+Run `composer create-project sylius/plugin-skeleton ProjectName`.
 
-1. Add this to `@SyliusAdmin/PaymentMethod/_form.html.twig` template.
+### Traditional
 
-```twig
+1. From the plugin skeleton root directory, run the following commands:
 
-<div class="ui segment">
-	<h4 class="ui dividing header">{{ 'mango-sylius.ui.payment_charges'|trans }}</h4>
-	{{ form_row(form.calculator) }}
-	{% for name, calculatorConfigurationPrototype in form.vars.prototypes %}
-		<div id="{{ form.calculator.vars.id }}_{{ name }}" data-container=".calculatorConfiguration"
-			 data-prototype="{{ form_widget(calculatorConfigurationPrototype)|e }}">
-		</div>
-	{% endfor %}
-	<div class="ui segment calculatorConfiguration">
-		{% if form.calculatorConfiguration is defined %}
-			{% for field in form.calculatorConfiguration %}
-				{{ form_row(field) }}
-			{% endfor %}
-		{% endif %}
-	</div>
-</div>
-```
+    ```bash
+    (cd vendor/sylius/test-application && yarn install)
+    (cd vendor/sylius/test-application && yarn build)
+    vendor/bin/console assets:install
+   
+    vendor/bin/console doctrine:database:create
+    vendor/bin/console doctrine:migrations:migrate -n
+    # Optionally load data fixtures
+    vendor/bin/console sylius:fixtures:load -n
+    ```
 
-2. Add this to `AdminBundle/Resources/views/Order/Show/Summary/_totals.html.twig`.
+To be able to set up a plugin's database, remember to configure your database credentials in `tests/TestApplication/.env` and `tests/TestApplication/.env.test`.
 
-```twig
+2. Run your local server:
 
-{% set paymentFeeAdjustment = constant('MangoSylius\\PaymentFeePlugin\\Model\\AdjustmentInterface::PAYMENT_ADJUSTMENT') %}
+      ```bash
+      symfony server:ca:install
+      symfony server:start -d
+      ```
 
-{% set paymentFeeAdjustments = order.getAdjustmentsRecursively(paymentFeeAdjustment) %}
-{% if paymentFeeAdjustments is not empty %}
-	<tr>
-		<td colspan="4" id="payment-fee">
+3. Open your browser and navigate to `https://localhost:8000`.
 
-			<div class="ui relaxed divided list">
-				{% for paymentFeeLabel, paymentFeeAmount in sylius_aggregate_adjustments(paymentFeeAdjustments) %}
-					<div class="item">
-						<div class="content">
-							<span class="header">{{ paymentFeeLabel }}</span>
-							<div class="description">
-								{{ money.format(paymentFeeAmount, order.currencyCode) }}
-							</div>
-						</div>
-					</div>
-				{% endfor %}
-			</div>
+### Docker
 
-		</td>
-		<td colspan="4" id="paymentFee-total" class="right aligned">
-			<strong>{{ 'mango-sylius.ui.paymentFee_total'|trans }}</strong>:
-			{{ money.format(order.getAdjustmentsTotal(paymentFeeAdjustment) ,order.currencyCode) }}
-		</td>
-	</tr>
-{% endif %}
-```
+1. Execute `make init` to initialize the container and install the dependencies.
 
-## Development
+2. Execute `make database-init` to create the database and run migrations.
 
-### Usage
+3. (Optional) Execute `make load-fixtures` to load the fixtures.
 
-- Create symlink from .env.dist to .env or create your own .env file
-- Develop your plugin in `/src`
-- See `bin/` for useful commands
+4. Your app is available at `http://localhost`.
 
-### Testing
+## Usage
 
-After your changes you must ensure that the tests are still passing.
-* Easy Coding Standard
-  ```bash
-  bin/ecs.sh
-  ```
-* PHPStan
-  ```bash
-  bin/phpstan.sh
-  ```
-License
--------
-This library is under the MIT license.
+### Running plugin tests
 
-Credits
--------
-Developed by [manGoweb](https://www.mangoweb.eu/).
+  - PHPUnit
+
+    ```bash
+    vendor/bin/phpunit
+    ```
+
+  - Behat (non-JS scenarios)
+
+    ```bash
+    vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"
+    ```
+
+  - Behat (JS scenarios)
+ 
+    1. [Install Symfony CLI command](https://symfony.com/download).
+ 
+    2. Start Headless Chrome:
+    
+      ```bash
+      google-chrome-stable --enable-automation --disable-background-networking --no-default-browser-check --no-first-run --disable-popup-blocking --disable-default-apps --allow-insecure-localhost --disable-translate --disable-extensions --no-sandbox --enable-features=Metal --headless --remote-debugging-port=9222 --window-size=2880,1800 --proxy-server='direct://' --proxy-bypass-list='*' http://127.0.0.1
+      ```
+    
+    3. Install SSL certificates (only once needed) and run test application's webserver on `127.0.0.1:8080`:
+    
+      ```bash
+      symfony server:ca:install
+      APP_ENV=test symfony server:start --port=8080 --daemon
+      ```
+    
+    4. Run Behat:
+    
+      ```bash
+      vendor/bin/behat --strict --tags="@javascript,@mink:chromedriver"
+      ```
+    
+  - Static Analysis
+      
+    - PHPStan
+    
+      ```bash
+      vendor/bin/phpstan analyse -c phpstan.neon -l max src/  
+      ```
+
+  - Coding Standard
+  
+    ```bash
+    vendor/bin/ecs check
+    ```
+
+### Opening Sylius with your plugin
+
+- Using `test` environment:
+
+    ```bash
+    APP_ENV=test vendor/bin/console sylius:fixtures:load -n
+    APP_ENV=test symfony server:start -d
+    ```
+    
+- Using `dev` environment:
+
+    ```bash
+    vendor/bin/console sylius:fixtures:load -n
+    symfony server:start -d
+    ```

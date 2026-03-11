@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    ui:
+        payment_charges: Payment charges
+        payment_fee_total: Payment fees total
+    form:
+        payment_method:
+            calculator: Calculator
+        calculator:
+            flat_rate:
+                label: Flat rate
+                amount: Amount
+            free:
+                label: Free

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace MangoSylius\PaymentFeePlugin\Model;
+namespace Elcuro\SyliusPaymentFeePlugin\Model;
 
 use Sylius\Component\Core\Model\AdjustmentInterface as SyliusAdjustmentInterface;
 
 interface AdjustmentInterface extends SyliusAdjustmentInterface
 {
-	public const PAYMENT_ADJUSTMENT = 'payment';
+    public const PAYMENT_ADJUSTMENT = 'payment';
 }

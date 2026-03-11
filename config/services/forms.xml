@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <service id="Elcuro\SyliusPaymentFeePlugin\Form\Type\Calculator\FlatRateConfigurationType" />
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Form\Type\CalculatorChoiceType">
+            <argument>%elcuro_sylius_payment_fee.calculators%</argument>
+            <tag name="form.type" />
+        </service>
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Form\Extension\PaymentMethodTypeExtension">
+            <argument type="service" id="elcuro_sylius_payment_fee.registry.calculator" />
+            <argument type="service" id="elcuro_sylius_payment_fee.form_registry.calculator" />
+            <tag name="form.type_extension" />
+        </service>
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Form\Extension\PaymentMethodChoiceTypeExtension">
+            <argument type="service" id="elcuro_sylius_payment_fee.registry.calculator" />
+            <tag name="form.type_extension" />
+        </service>
+    </services>
+</container>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <!-- Payment charges processor: calculates and adds payment fee adjustments -->
+        <service id="Elcuro\SyliusPaymentFeePlugin\OrderProcessing\PaymentChargesProcessor">
+            <argument type="service" id="sylius.factory.adjustment" />
+            <argument type="service" id="Elcuro\SyliusPaymentFeePlugin\Calculator\DelegatingCalculator" />
+            <tag name="sylius.order_processor" priority="15" />
+        </service>
+
+        <!-- Second OrderPaymentProcessor at higher priority to ensure payments exist before fee calculation -->
+        <service id="elcuro_sylius_payment_fee.order_processing.order_payment_processor" class="Sylius\Component\Core\OrderProcessing\OrderPaymentProcessor">
+            <argument type="service" id="sylius.provider.payment.order" />
+            <argument type="service" id="sylius.remover.payment.order" />
+            <argument>%sylius.order_payment_processor.checkout.unsupported_states%</argument>
+            <argument>cart</argument>
+            <tag name="sylius.order_processor" priority="25" />
+        </service>
+    </services>
+</container>

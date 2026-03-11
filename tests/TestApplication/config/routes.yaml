@@ -1,0 +1,5 @@
+elcuro_sylius_payment_fee_admin:
+    resource: "@ElcuroSyliusPaymentFeePlugin/config/routes/admin.yaml"
+
+elcuro_sylius_payment_fee_shop:
+    resource: "@ElcuroSyliusPaymentFeePlugin/config/routes/shop.yaml"

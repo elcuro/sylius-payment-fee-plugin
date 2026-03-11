@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <service id="elcuro_sylius_payment_fee.registry.calculator" class="Sylius\Component\Registry\ServiceRegistry">
+            <argument>Elcuro\SyliusPaymentFeePlugin\Calculator\CalculatorInterface</argument>
+            <argument>payment fee calculator</argument>
+        </service>
+
+        <service id="elcuro_sylius_payment_fee.form_registry.calculator" class="Sylius\Bundle\ResourceBundle\Form\Registry\FormTypeRegistry" />
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Calculator\DelegatingCalculator">
+            <argument type="service" id="elcuro_sylius_payment_fee.registry.calculator" />
+        </service>
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Calculator\DelegatingCalculatorInterface" alias="Elcuro\SyliusPaymentFeePlugin\Calculator\DelegatingCalculator" />
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Calculator\FlatRateCalculator">
+            <tag name="Elcuro\SyliusPaymentFeePlugin\Calculator\DelegatingCalculator"
+                 calculator="flat_rate"
+                 form_type="Elcuro\SyliusPaymentFeePlugin\Form\Type\Calculator\ChannelBasedFlatRateConfigurationType"
+                 label="elcuro_sylius_payment_fee.form.calculator.flat_rate.label" />
+        </service>
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Calculator\FreeCalculator">
+            <tag name="Elcuro\SyliusPaymentFeePlugin\Calculator\DelegatingCalculator"
+                 calculator="free"
+                 label="elcuro_sylius_payment_fee.form.calculator.free.label" />
+        </service>
+    </services>
+</container>

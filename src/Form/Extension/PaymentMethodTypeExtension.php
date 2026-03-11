@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace MangoSylius\PaymentFeePlugin\Form\Extension;
+namespace Elcuro\SyliusPaymentFeePlugin\Form\Extension;
 
-use MangoSylius\PaymentFeePlugin\Form\Type\CalculatorChoiceType;
-use MangoSylius\PaymentFeePlugin\Model\Calculator\CalculatorInterface;
-use MangoSylius\PaymentFeePlugin\Model\PaymentMethodWithFeeInterface;
+use Elcuro\SyliusPaymentFeePlugin\Calculator\CalculatorInterface;
+use Elcuro\SyliusPaymentFeePlugin\Form\Type\CalculatorChoiceType;
+use Elcuro\SyliusPaymentFeePlugin\Model\PaymentMethodWithFeeInterface;
 use Sylius\Bundle\PaymentBundle\Form\Type\PaymentMethodType as SyliusPaymentMethodType;
-use Sylius\Bundle\ResourceBundle\Form\EventSubscriber\AddCodeFormSubscriber;
 use Sylius\Bundle\ResourceBundle\Form\Registry\FormTypeRegistryInterface;
 use Sylius\Bundle\TaxationBundle\Form\Type\TaxCategoryChoiceType;
 use Sylius\Component\Registry\ServiceRegistryInterface;
@@ -19,102 +18,94 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-class PaymentMethodTypeExtension extends AbstractTypeExtension
+final class PaymentMethodTypeExtension extends AbstractTypeExtension
 {
-	/**
-	 * @var ServiceRegistryInterface
-	 */
-	private $calculatorRegistry;
+    public function __construct(
+        private ServiceRegistryInterface $calculatorRegistry,
+        private FormTypeRegistryInterface $formTypeRegistry,
+    ) {
+    }
 
-	/**
-	 * @var FormTypeRegistryInterface
-	 */
-	private $formTypeRegistry;
+    public static function getExtendedTypes(): iterable
+    {
+        return [SyliusPaymentMethodType::class];
+    }
 
-	public function __construct(
-		ServiceRegistryInterface $calculatorRegistry,
-		FormTypeRegistryInterface $formTypeRegistry
-	) {
-		$this->calculatorRegistry = $calculatorRegistry;
-		$this->formTypeRegistry = $formTypeRegistry;
-	}
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('taxCategory', TaxCategoryChoiceType::class, [
+                'required' => false,
+                'label' => 'sylius.form.shipping_method.tax_category',
+            ])
+            ->add('calculator', CalculatorChoiceType::class, [
+                'label' => 'elcuro_sylius_payment_fee.form.payment_method.calculator',
+            ])
+            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+                /** @var PaymentMethodWithFeeInterface|null $method */
+                $method = $event->getData();
 
-	public function buildForm(FormBuilderInterface $builder, array $options)
-	{
-		$builder
-			->addEventSubscriber(new AddCodeFormSubscriber())
-			->add('taxCategory', TaxCategoryChoiceType::class)
-			->add('calculator', CalculatorChoiceType::class, [
-				'label' => 'mango-sylius.form.payment_method.calculator',
-			]
-			)->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-				$method = $event->getData();
+                if (!$method instanceof PaymentMethodWithFeeInterface || $method->getId() === null) {
+                    return;
+                }
 
-				if ($method === null || $method->getId() === null) {
-					return;
-				}
+                if ($method->getCalculator() !== null) {
+                    $this->addConfigurationField($event->getForm(), $method->getCalculator());
+                }
+            })
+            ->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
+                $data = $event->getData();
 
-				if ($method instanceof PaymentMethodWithFeeInterface && $method->getCalculator() !== null) {
-					$this->addConfigurationField($event->getForm(), $method->getCalculator());
-				}
-			}
-			)
-			->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-				$data = $event->getData();
+                if (!\is_array($data) || empty($data) || !array_key_exists('calculator', $data)) {
+                    return;
+                }
 
-				if (!is_array($data) || empty($data) || !array_key_exists('calculator', $data)) {
-					return;
-				}
+                $this->addConfigurationField($event->getForm(), $data['calculator']);
+            })
+        ;
 
-				$this->addConfigurationField($event->getForm(), $data['calculator']);
-			}
-			);
+        $prototypes = [];
+        foreach ($this->calculatorRegistry->all() as $name => $calculator) {
+            \assert($calculator instanceof CalculatorInterface);
+            $calculatorType = $calculator->getType();
 
-		$prototypes = [];
-		foreach ($this->calculatorRegistry->all() as $name => $calculator) {
-			assert($calculator instanceof CalculatorInterface);
-			$calculatorType = $calculator->getType();
+            if (!$this->formTypeRegistry->has($calculatorType, 'default')) {
+                continue;
+            }
 
-			if (!$this->formTypeRegistry->has($calculatorType, 'default')) {
-				continue;
-			}
+            /** @var class-string<\Symfony\Component\Form\FormTypeInterface> $formType */
+            $formType = $this->formTypeRegistry->get($calculatorType, 'default');
+            $form = $builder->create('calculatorConfiguration', $formType);
+            $prototypes['calculators'][$name] = $form->getForm();
+        }
 
-			$form = $builder->create('calculatorConfiguration', $this->formTypeRegistry->get($calculatorType, 'default'));
+        $builder->setAttribute('prototypes', $prototypes);
+    }
 
-			$prototypes['calculators'][$name] = $form->getForm();
-		}
+    public function buildView(FormView $view, FormInterface $form, array $options): void
+    {
+        $view->vars['prototypes'] = [];
 
-		$builder->setAttribute('prototypes', $prototypes);
-	}
+        /** @var array<string, array<string, FormInterface>> $allPrototypes */
+        $allPrototypes = $form->getConfig()->getAttribute('prototypes');
 
-	private function addConfigurationField(FormInterface $form, string $calculatorName): void
-	{
-		$calculator = $this->calculatorRegistry->get($calculatorName);
-		assert($calculator instanceof CalculatorInterface);
+        foreach ($allPrototypes as $group => $prototypes) {
+            foreach ($prototypes as $type => $prototype) {
+                $view->vars['prototypes'][$group . '_' . $type] = $prototype->createView($view);
+            }
+        }
+    }
 
-		$calculatorType = $calculator->getType();
-		if (!$this->formTypeRegistry->has($calculatorType, 'default')) {
-			return;
-		}
+    private function addConfigurationField(FormInterface $form, string $calculatorName): void
+    {
+        /** @var CalculatorInterface $calculator */
+        $calculator = $this->calculatorRegistry->get($calculatorName);
+        $calculatorType = $calculator->getType();
 
-		$form->add('calculatorConfiguration', $this->formTypeRegistry->get($calculatorType, 'default'));
-	}
+        if (!$this->formTypeRegistry->has($calculatorType, 'default')) {
+            return;
+        }
 
-	public function buildView(FormView $view, FormInterface $form, array $options): void
-	{
-		$view->vars['prototypes'] = [];
-		foreach ($form->getConfig()->getAttribute('prototypes') as $group => $prototypes) {
-			foreach ($prototypes as $type => $prototype) {
-				$view->vars['prototypes'][$group . '_' . $type] = $prototype->createView($view);
-			}
-		}
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getExtendedType()
-	{
-		return SyliusPaymentMethodType::class;
-	}
+        $form->add('calculatorConfiguration', $this->formTypeRegistry->get($calculatorType, 'default'));
+    }
 }
