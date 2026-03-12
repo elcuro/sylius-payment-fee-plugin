@@ -3,6 +3,17 @@
 <container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <defaults public="true" />
-        <!-- Put your Behat services here -->
+
+        <service id="elcuro_sylius_payment_fee.behat.context.setup.payment_fee"
+                 class="Tests\Elcuro\SyliusPaymentFeePlugin\Behat\Context\Setup\PaymentFeeContext">
+            <argument type="service" id="sylius.behat.shared_storage" />
+            <argument type="service" id="sylius.manager.payment_method" />
+            <argument type="service" id="sylius.converter.country_name" />
+        </service>
+
+        <service id="elcuro_sylius_payment_fee.behat.context.domain.payment_fee"
+                 class="Tests\Elcuro\SyliusPaymentFeePlugin\Behat\Context\Domain\PaymentFeeContext">
+            <argument type="service" id="sylius.behat.shared_storage" />
+        </service>
     </services>
 </container>

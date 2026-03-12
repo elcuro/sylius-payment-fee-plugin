@@ -4,8 +4,9 @@ Payment method fee plugin for Sylius 2.0. Adds configurable fees to payment meth
 
 ## Features
 
-- **Fee Calculators**: Flat rate (per-channel configuration) and free calculator, with support for custom calculators
+- **Fee Calculators**: Flat rate (per-channel), country rate (per-country with currency conversion), and free calculator, with support for custom calculators
 - **Per-channel configuration**: Different fee amounts for each sales channel
+- **Per-country configuration**: Different fee amounts and currencies for each country, with automatic currency conversion via exchange rates
 - **Tax support**: Assign tax categories to payment fees
 - **Admin UI**: Calculator selection and configuration on Payment Method edit page, fee display on order detail
 - **Shop UI**: Payment fee displayed during checkout
@@ -56,6 +57,7 @@ Go to **Admin > Configuration > Payment Methods**, edit a payment method, and se
 
 - **Free** — no fee (default)
 - **Flat Rate** — fixed fee amount per channel
+- **Country Rate** — fee amount and currency per country; if the order currency differs from the configured currency, the fee is automatically converted using Sylius exchange rates
 
 Optionally assign a **Tax Category** to apply tax on the payment fee.
 
@@ -90,6 +92,10 @@ vendor/bin/console assets:install
 ```bash
 vendor/bin/phpunit                                                    # PHPUnit
 vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"  # Behat (non-JS)
+
+# JS scenarios require Chrome headless + Symfony server on port 8080
+APP_ENV=test symfony server:start --port=8080 --daemon
+vendor/bin/behat --strict --tags="@javascript,@mink:chromedriver"
 ```
 
 ### Code Quality

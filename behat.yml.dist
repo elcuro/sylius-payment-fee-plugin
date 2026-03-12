@@ -1,0 +1,43 @@
+imports:
+    - vendor/sylius/sylius/src/Sylius/Behat/Resources/config/suites.yml
+    - tests/Behat/Resources/suites.yml
+
+default:
+    calls:
+        error_reporting: 8191
+
+    formatters:
+        pretty:
+            verbose: true
+            paths: false
+            snippets: false
+
+    extensions:
+        FriendsOfBehat\MinkDebugExtension:
+            directory: etc/build
+            clean_start: false
+            screenshot: true
+
+        Behat\MinkExtension:
+            files_path: "%paths.base%/vendor/sylius/sylius/src/Sylius/Behat/Resources/fixtures/"
+            base_url: "https://sylius-payment-fee-plugin.ddev.site/"
+            default_session: symfony
+            sessions:
+                symfony:
+                    symfony: ~
+            show_auto: false
+
+        FriendsOfBehat\SymfonyExtension:
+            bootstrap: vendor/sylius/test-application/config/bootstrap.php
+            kernel:
+                class: Sylius\TestApplication\Kernel
+                path: vendor/sylius/test-application/src/Kernel.php
+                environment: test
+
+        FriendsOfBehat\VariadicExtension: ~
+
+        SyliusLabs\SuiteTagsExtension: ~
+
+    gherkin:
+        filters:
+            tags: "~@todo&&~@cli"
