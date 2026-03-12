@@ -8,6 +8,14 @@
     <services>
         <service id="Elcuro\SyliusPaymentFeePlugin\Form\Type\Calculator\FlatRateConfigurationType" />
 
+        <service id="Elcuro\SyliusPaymentFeePlugin\Form\Type\Calculator\CountryRateConfigurationType" />
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Form\Type\Calculator\CountryBasedCountryRateConfigurationType">
+            <argument type="service" id="sylius.repository.country" />
+            <argument type="service" id="sylius.repository.currency" />
+            <tag name="form.type" />
+        </service>
+
         <service id="Elcuro\SyliusPaymentFeePlugin\Form\Type\CalculatorChoiceType">
             <argument>%elcuro_sylius_payment_fee.calculators%</argument>
             <tag name="form.type" />

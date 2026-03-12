@@ -11,3 +11,7 @@ elcuro_sylius_payment_fee:
                 amount: Betrag
             free:
                 label: Kostenlos
+            country_rate:
+                label: Ländertarif
+                currency: Währung
+                amount: Betrag

@@ -31,5 +31,13 @@
                  calculator="free"
                  label="elcuro_sylius_payment_fee.form.calculator.free.label" />
         </service>
+
+        <service id="Elcuro\SyliusPaymentFeePlugin\Calculator\CountryRateCalculator">
+            <argument type="service" id="Sylius\Component\Currency\Converter\CurrencyConverterInterface" />
+            <tag name="Elcuro\SyliusPaymentFeePlugin\Calculator\DelegatingCalculator"
+                 calculator="country_rate"
+                 form_type="Elcuro\SyliusPaymentFeePlugin\Form\Type\Calculator\CountryBasedCountryRateConfigurationType"
+                 label="elcuro_sylius_payment_fee.form.calculator.country_rate.label" />
+        </service>
     </services>
 </container>

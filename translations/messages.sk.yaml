@@ -11,3 +11,7 @@ elcuro_sylius_payment_fee:
                 amount: Suma
             free:
                 label: Zadarmo
+            country_rate:
+                label: Sadzba podľa krajiny
+                currency: Mena
+                amount: Suma

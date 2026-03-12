@@ -11,3 +11,7 @@ elcuro_sylius_payment_fee:
                 amount: Összeg
             free:
                 label: Ingyenes
+            country_rate:
+                label: Országalapú díj
+                currency: Pénznem
+                amount: Összeg

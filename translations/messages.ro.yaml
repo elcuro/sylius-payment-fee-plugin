@@ -11,3 +11,7 @@ elcuro_sylius_payment_fee:
                 amount: Sumă
             free:
                 label: Gratuit
+            country_rate:
+                label: Tarif pe țară
+                currency: Monedă
+                amount: Sumă
