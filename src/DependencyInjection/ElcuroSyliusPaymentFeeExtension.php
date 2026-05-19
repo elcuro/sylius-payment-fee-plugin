@@ -28,7 +28,7 @@ final class ElcuroSyliusPaymentFeeExtension extends AbstractResourceExtension im
 
     protected function getMigrationsNamespace(): string
     {
-        return 'DoctrineMigrations';
+        return 'Elcuro\SyliusPaymentFeePlugin\Migrations';
     }
 
     protected function getMigrationsDirectory(): string
