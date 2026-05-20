@@ -38,6 +38,15 @@
         const calculatorSelect = document.getElementById('{{ form.calculator.vars.id }}');
         if (!calculatorSelect) return;
 
+        // When the form is rendered as a Symfony UX Live Component (the Sylius 2.x
+        // admin payment method form is sylius_admin:payment_method:form), the server
+        // re-renders calculatorConfiguration via PRE_SUBMIT on every change and
+        // morphdoms the new HTML in. Doing the prototype injection below on top of
+        // that would duplicate the fields, so skip it under Live.
+        if (calculatorSelect.closest('[data-live-name-value]')) {
+            return;
+        }
+
         function updateCalculatorConfiguration() {
             const configContainer = document.querySelector('.calculator-configuration');
             configContainer.innerHTML = '';
