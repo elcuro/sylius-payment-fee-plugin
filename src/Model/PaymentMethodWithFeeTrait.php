@@ -16,7 +16,7 @@ trait PaymentMethodWithFeeTrait
     #[ORM\Column(name: 'calculator_configuration', type: 'json', nullable: true)]
     protected array $calculatorConfiguration = [];
 
-    #[ORM\ManyToOne(targetEntity: \Sylius\Component\Taxation\Model\TaxCategory::class)]
+    #[ORM\ManyToOne(targetEntity: TaxCategoryInterface::class)]
     #[ORM\JoinColumn(name: 'tax_category_id')]
     protected ?TaxCategoryInterface $taxCategory = null;
 
