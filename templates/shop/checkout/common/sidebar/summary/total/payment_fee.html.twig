@@ -1,0 +1,14 @@
+{% import "@SyliusShop/shared/macro/money.html.twig" as money %}
+
+{% set order = hookable_metadata.context.order %}
+{% set payment_adjustment = constant('Elcuro\\SyliusPaymentFeePlugin\\Model\\AdjustmentInterface::PAYMENT_ADJUSTMENT') %}
+{% set payment_fee_total = order.getAdjustmentsTotal(payment_adjustment) %}
+
+{% if payment_fee_total != 0 %}
+    <tr>
+        <td>{{ 'elcuro_sylius_payment_fee.ui.payment_fee_total'|trans }}:</td>
+        <td class="text-end">
+            <span id="sylius-shop-checkout-summary-payment-fee-total">{{ money.convertAndFormat(payment_fee_total) }}</span>
+        </td>
+    </tr>
+{% endif %}
