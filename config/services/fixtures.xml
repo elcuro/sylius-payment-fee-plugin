@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <!-- Overrides the core definitions so the payment_method fixture accepts fee_* options -->
+        <service id="sylius.fixture.example_factory.payment_method" class="Elcuro\SyliusPaymentFeePlugin\Fixture\Factory\PaymentMethodExampleFactory">
+            <argument type="service" id="sylius.factory.payment_method" />
+            <argument type="service" id="sylius.repository.locale" />
+            <argument type="service" id="sylius.repository.channel" />
+            <argument type="service" id="sylius.repository.tax_category" />
+        </service>
+
+        <service id="sylius.fixture.payment_method" class="Elcuro\SyliusPaymentFeePlugin\Fixture\PaymentMethodFixture">
+            <argument type="service" id="sylius.manager.payment_method" />
+            <argument type="service" id="sylius.fixture.example_factory.payment_method" />
+            <tag name="sylius_fixtures.fixture" />
+        </service>
+    </services>
+</container>

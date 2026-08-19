@@ -12,6 +12,19 @@ sylius_payment:
             classes:
                 model: Tests\Elcuro\SyliusPaymentFeePlugin\Entity\PaymentMethod
 
+sylius_fixtures:
+    suites:
+        default:
+            fixtures:
+                payment_method:
+                    options:
+                        custom:
+                            cash_on_delivery:
+                                fee_calculator: 'flat_rate'
+                                fee_calculator_configuration:
+                                    FASHION_WEB:
+                                        amount: 500
+
 doctrine:
     orm:
         entity_managers:
