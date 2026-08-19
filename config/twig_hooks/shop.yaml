@@ -18,6 +18,16 @@ sylius_twig_hooks:
                 template: '@ElcuroSyliusPaymentFeePlugin/shop/cart/index/content/form/sections/general/summary/payment_fee.html.twig'
                 priority: 250
 
+        'sylius_shop.shared.form.select_payment.payment.choice':
+            details:
+                template: '@ElcuroSyliusPaymentFeePlugin/shop/shared/form/select_payment/payment/choice/details.html.twig'
+                priority: 0
+
+        'sylius_shop.shared.form.select_payment.payment.choice.fee':
+            fee:
+                template: '@ElcuroSyliusPaymentFeePlugin/shop/shared/form/select_payment/payment/choice/fee.html.twig'
+                priority: 0
+
         'sylius_shop.checkout.common.sidebar.summary.total':
             payment_fee:
                 template: '@ElcuroSyliusPaymentFeePlugin/shop/checkout/common/sidebar/summary/total/payment_fee.html.twig'

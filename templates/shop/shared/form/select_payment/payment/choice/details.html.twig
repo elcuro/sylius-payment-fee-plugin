@@ -1,0 +1,8 @@
+<div class="card bg-body-tertiary border-0 mb-3" {{ sylius_test_html_attribute('payment-item') }}>
+    <label class="d-flex gap-3 card-body">
+        <div class="flex-grow-1">
+            {% hook 'details' %}
+        </div>
+        {% hook 'fee' %}
+    </label>
+</div>

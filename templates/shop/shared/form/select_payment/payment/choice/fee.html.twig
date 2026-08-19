@@ -1,0 +1,10 @@
+{% import '@SyliusShop/shared/macro/money.html.twig' as money %}
+
+{% set form = hookable_metadata.context.form %}
+{% set fee = form.parent.vars.payment_costs[form.vars.value]|default(0) %}
+
+{% if fee > 0 %}
+    <div {{ sylius_test_html_attribute('payment-method-fee') }}>
+        {{ money.convertAndFormat(fee) }}
+    </div>
+{% endif %}
