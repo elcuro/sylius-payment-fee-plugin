@@ -79,7 +79,31 @@ vendor/bin/ecs check                                      # Coding standards (Sy
 - `src/Model/AdjustmentInterface.php` — Defines `PAYMENT_FEE_ADJUSTMENT` constant
 
 ### Order Processing
-- `src/OrderProcessing/PaymentChargesProcessor.php` — Calculates and applies payment fee adjustments to orders
+- `src/OrderProcessing/PaymentChargesProcessor.php` — Calculates and applies payment fee adjustments to orders (priority 15, i.e. before `OrderTaxesProcessor` at 10, so the tax applicator sees the gross fee)
+- `src/OrderProcessing/PaymentFeeReverseChargeProcessor.php` — Nets the fee when the order is VAT reverse charged (priority 5, after taxes and after any reverse-charge processor)
+
+#### Why the fee tax cannot be cancelled the usual way
+
+`OrderPaymentTaxesApplicator` has no adjustable to attach to — a payment is not an `AdjustableInterface` —
+so the fee tax lands on the **order**. Two consequences:
+
+1. A reverse-charge processor that walks item units and shipments (`elcuro/sylius-enhanced-plugin`) never
+   reaches it, and the fee VAT survives in `Order::getTaxTotal()`.
+2. Cancelling it with a negative order-level `TAX_ADJUSTMENT` does fix the total, but
+   `Order::getShippingTotal()` sums `SHIPPING_ADJUSTMENT + ORDER_SHIPPING_PROMOTION_ADJUSTMENT +
+   TAX_ADJUSTMENT` **at order level** — so the deduction shows up on the shipping row while the fee row stays
+   gross.
+
+`PaymentFeeReverseChargeProcessor` therefore removes the fee's tax adjustments outright and subtracts the
+included tax from the fee adjustment itself (`Adjustment::setAmount()` recalculates the adjustable when the
+adjustment is non-neutral, so no manual recalculation is needed). Every run of the pipeline starts from a
+gross fee (priority 15) and freshly built taxes (priority 10), which keeps the processor idempotent.
+
+Reverse charge is detected via a `reverseCharge` flag in an adjustment's `details` — a convention shared with
+`elcuro/sylius-enhanced-plugin` (writer) and `elcuro/sylius-superfaktura-plugin` (reader), deliberately not a
+package dependency. Note that shipment adjustments live in the order's adjustment collection too
+(`Adjustment::setShipment()` calls `setAdjustable($shipment->getOrder())`), so scanning
+`$order->getAdjustments(TAX_ADJUSTMENT)` covers shipping as well as order level.
 
 ### Taxation
 - `src/Taxation/Applicator/OrderPaymentTaxesApplicator.php` — Applies tax to payment fee adjustments

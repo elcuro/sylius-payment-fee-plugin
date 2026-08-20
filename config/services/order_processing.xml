@@ -13,6 +13,12 @@
             <tag name="sylius.order_processor" priority="15" />
         </service>
 
+        <!-- Runs after OrderTaxesProcessor (10) and after any reverse-charge processor (9), so it sees the
+             final tax adjustments before netting the fee -->
+        <service id="Elcuro\SyliusPaymentFeePlugin\OrderProcessing\PaymentFeeReverseChargeProcessor">
+            <tag name="sylius.order_processor" priority="5" />
+        </service>
+
         <!-- Second OrderPaymentProcessor at higher priority to ensure payments exist before fee calculation -->
         <service id="elcuro_sylius_payment_fee.order_processing.order_payment_processor" class="Sylius\Component\Core\OrderProcessing\OrderPaymentProcessor">
             <argument type="service" id="sylius.provider.payment.order" />

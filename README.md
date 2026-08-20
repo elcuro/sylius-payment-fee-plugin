@@ -7,7 +7,7 @@ Payment method fee plugin for Sylius 2.0. Adds configurable fees to payment meth
 - **Fee Calculators**: Flat rate (per-channel), country rate (per-country with currency conversion), and free calculator, with support for custom calculators
 - **Per-channel configuration**: Different fee amounts for each sales channel
 - **Per-country configuration**: Different fee amounts and currencies for each country, with automatic currency conversion via exchange rates
-- **Tax support**: Assign tax categories to payment fees
+- **Tax support**: Assign tax categories to payment fees, including VAT reverse charge
 - **Admin UI**: Calculator selection and configuration on Payment Method edit page, fee display on order detail
 - **Shop UI**: Payment fee displayed during checkout
 
@@ -60,6 +60,20 @@ Go to **Admin > Configuration > Payment Methods**, edit a payment method, and se
 - **Country Rate** — fee amount and currency per country; if the order currency differs from the configured currency, the fee is automatically converted using Sylius exchange rates
 
 Optionally assign a **Tax Category** to apply tax on the payment fee.
+
+### VAT reverse charge
+
+If another plugin removes VAT from an order (EU reverse charge), the fee follows automatically —
+`PaymentFeeReverseChargeProcessor` drops the fee's tax adjustments and takes the tax they carried off the
+fee itself, so the checkout shows the fee net and `Order::getTaxTotal()` reaches zero.
+
+Reverse charge is recognised by a `reverseCharge` detail flag on any of the order's tax adjustments — the
+convention `elcuro/sylius-enhanced-plugin` writes and `elcuro/sylius-superfaktura-plugin` reads. There is no
+package dependency on either: without such a plugin nothing carries the flag and the processor stays inert.
+
+The fee tax is *not* cancelled with a negative order-level tax adjustment, which would be the obvious move.
+`Order::getShippingTotal()` adds every non-neutral order-level `TAX_ADJUSTMENT` to the shipping line, so the
+deduction would silently land on the shipping row instead of the fee row.
 
 ## Development
 
