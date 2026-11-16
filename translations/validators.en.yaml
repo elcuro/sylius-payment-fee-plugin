@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    payment_method:
+        calculator:
+            unknown: 'Fee calculator {{ value }} does not exist. Use one of: {{ choices }}.'
+        calculator_configuration:
+            channel_missing: 'Enter the fee for channel {{ field }}.'
+            channel_unknown: 'Channel {{ field }} does not exist.'
+            country_unknown: 'Country {{ field }} does not exist.'
+            amount_not_blank: 'Enter the fee amount.'
+            amount_integer: 'The fee must be a whole number in the smallest currency unit (e.g. 150 for 1.50).'
+            amount_negative: 'The fee cannot be negative.'
+            currency_not_blank: 'Choose the currency of the fee.'
+            currency_unknown: 'Currency {{ value }} does not exist in the shop.'

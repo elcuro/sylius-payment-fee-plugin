@@ -9,8 +9,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Type;
 
 final class CountryRateConfigurationType extends AbstractType
 {
@@ -23,10 +21,6 @@ final class CountryRateConfigurationType extends AbstractType
             ])
             ->add('amount', MoneyType::class, [
                 'label' => 'elcuro_sylius_payment_fee.form.calculator.country_rate.amount',
-                'constraints' => [
-                    new NotBlank(['groups' => ['sylius']]),
-                    new Type(type: 'integer', groups: ['sylius']),
-                ],
                 'currency' => false,
                 'empty_data' => '0',
             ])

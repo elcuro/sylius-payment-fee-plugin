@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    payment_method:
+        calculator:
+            unknown: 'Kalkulator opłaty {{ value }} nie istnieje. Użyj jednego z: {{ choices }}.'
+        calculator_configuration:
+            channel_missing: 'Podaj opłatę dla kanału {{ field }}.'
+            channel_unknown: 'Kanał {{ field }} nie istnieje.'
+            country_unknown: 'Kraj {{ field }} nie istnieje.'
+            amount_not_blank: 'Podaj kwotę opłaty.'
+            amount_integer: 'Opłata musi być liczbą całkowitą w najmniejszej jednostce waluty (np. 150 dla 1,50).'
+            amount_negative: 'Opłata nie może być ujemna.'
+            currency_not_blank: 'Wybierz walutę opłaty.'
+            currency_unknown: 'Waluta {{ value }} nie istnieje w sklepie.'

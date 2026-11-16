@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    payment_method:
+        calculator:
+            unknown: 'Der Gebührenrechner {{ value }} existiert nicht. Verwenden Sie einen von: {{ choices }}.'
+        calculator_configuration:
+            channel_missing: 'Geben Sie die Gebühr für den Kanal {{ field }} ein.'
+            channel_unknown: 'Der Kanal {{ field }} existiert nicht.'
+            country_unknown: 'Das Land {{ field }} existiert nicht.'
+            amount_not_blank: 'Geben Sie den Gebührenbetrag ein.'
+            amount_integer: 'Die Gebühr muss eine ganze Zahl in der kleinsten Währungseinheit sein (z. B. 150 für 1,50).'
+            amount_negative: 'Die Gebühr darf nicht negativ sein.'
+            currency_not_blank: 'Wählen Sie die Währung der Gebühr.'
+            currency_unknown: 'Die Währung {{ value }} existiert im Shop nicht.'

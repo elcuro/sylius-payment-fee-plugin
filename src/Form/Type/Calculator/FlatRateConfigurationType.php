@@ -8,8 +8,6 @@ use Sylius\Bundle\MoneyBundle\Form\Type\MoneyType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Type;
 
 final class FlatRateConfigurationType extends AbstractType
 {
@@ -17,10 +15,6 @@ final class FlatRateConfigurationType extends AbstractType
     {
         $builder->add('amount', MoneyType::class, [
             'label' => 'elcuro_sylius_payment_fee.form.calculator.flat_rate.amount',
-            'constraints' => [
-                new NotBlank(['groups' => ['sylius']]),
-                new Type(type: 'integer', groups: ['sylius']),
-            ],
             'currency' => $options['currency'],
         ]);
     }

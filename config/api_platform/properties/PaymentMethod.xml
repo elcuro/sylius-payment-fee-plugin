@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<properties xmlns="https://api-platform.com/schema/metadata/properties-3.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://api-platform.com/schema/metadata/properties-3.0 https://api-platform.com/schema/metadata/properties-3.0.xsd"
+>
+    <property
+        resource="%sylius.model.payment_method.class%"
+        name="calculator"
+        description='Fee the customer pays for choosing this payment method, added to the order total as an order adjustment of type "payment". Name of the fee calculator: "free" (no fee), "flat_rate" (fixed amount per channel) or "country_rate" (amount and currency per country of the shipping address); a shop may register more. null means no fee, like "free". Its settings go into calculatorConfiguration.'
+        example="flat_rate"
+    />
+    <property
+        resource="%sylius.model.payment_method.class%"
+        name="calculatorConfiguration"
+        description='Settings of the fee calculator; amounts are integers in the smallest currency unit (cents: 150 = 1.50) and cannot be negative. "flat_rate": one entry per channel code for EVERY channel of the shop, {"WEB": {"amount": 150}}, in the base currency of that channel. "country_rate": entries keyed by country code, {"DE": {"currency": "EUR", "amount": 150}}; currency is a currency code of the shop, countries left out pay no fee, and when the order currency differs the amount is converted with the shop exchange rates. "free" ignores it. The whole object is replaced on write. Changing it does not change orders already placed.'
+        example='{"WEB": {"amount": 150}}'
+    >
+        <!-- array<string, mixed> in PHP, a JSON object on the wire; a full schema replaces the generated one, so it repeats the description -->
+        <schema>
+            <values>
+                <value name="type">object</value>
+                <value name="description">Settings of the fee calculator; amounts are integers in the smallest currency unit (cents: 150 = 1.50) and cannot be negative. "flat_rate": one entry per channel code for EVERY channel of the shop, {"WEB": {"amount": 150}}, in the base currency of that channel. "country_rate": entries keyed by country code, {"DE": {"currency": "EUR", "amount": 150}}; currency is a currency code of the shop, countries left out pay no fee, and when the order currency differs the amount is converted with the shop exchange rates. "free" ignores it. The whole object is replaced on write. Changing it does not change orders already placed.</value>
+                <value name="additionalProperties">
+                    <values>
+                        <value name="type">object</value>
+                    </values>
+                </value>
+            </values>
+        </schema>
+    </property>
+    <property
+        resource="%sylius.model.payment_method.class%"
+        name="taxCategory"
+        description="Tax category used to tax the payment fee (the tax rate of this category in the order's tax zone is applied to the fee); null means the fee is not taxed."
+    />
+</properties>

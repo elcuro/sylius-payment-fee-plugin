@@ -60,6 +60,11 @@ final class PaymentMethodTypeExtension extends AbstractTypeExtension
                     return;
                 }
 
+                // An unknown calculator is reported by the choice field; there is no configuration to add.
+                if (!\is_string($data['calculator']) || !$this->calculatorRegistry->has($data['calculator'])) {
+                    return;
+                }
+
                 $this->addConfigurationField($event->getForm(), $data['calculator']);
             })
         ;

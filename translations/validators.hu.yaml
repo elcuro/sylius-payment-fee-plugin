@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    payment_method:
+        calculator:
+            unknown: 'A(z) {{ value }} díjkalkulátor nem létezik. Használja az egyiket: {{ choices }}.'
+        calculator_configuration:
+            channel_missing: 'Adja meg a díjat a(z) {{ field }} csatornához.'
+            channel_unknown: 'A(z) {{ field }} csatorna nem létezik.'
+            country_unknown: 'A(z) {{ field }} ország nem létezik.'
+            amount_not_blank: 'Adja meg a díj összegét.'
+            amount_integer: 'A díjnak egész számnak kell lennie a pénznem legkisebb egységében (pl. 150 az 1,50-hez).'
+            amount_negative: 'A díj nem lehet negatív.'
+            currency_not_blank: 'Válassza ki a díj pénznemét.'
+            currency_unknown: 'A(z) {{ value }} pénznem nem létezik az áruházban.'

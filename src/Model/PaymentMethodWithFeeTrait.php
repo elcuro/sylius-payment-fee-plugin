@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Elcuro\SyliusPaymentFeePlugin\Model;
 
 use Doctrine\ORM\Mapping as ORM;
+use Elcuro\SyliusPaymentFeePlugin\Validator\Constraints\CalculatorConfiguration;
+use Elcuro\SyliusPaymentFeePlugin\Validator\Constraints\RegisteredCalculator;
 use Sylius\Component\Taxation\Model\TaxCategoryInterface;
 
 trait PaymentMethodWithFeeTrait
 {
     #[ORM\Column(name: 'calculator', type: 'text', nullable: true)]
+    #[RegisteredCalculator(groups: ['sylius', 'Default'])]
     protected ?string $calculator = null;
 
     /** @var array<string, mixed> */
     #[ORM\Column(name: 'calculator_configuration', type: 'json', nullable: true)]
+    #[CalculatorConfiguration(groups: ['sylius', 'Default'])]
     protected array $calculatorConfiguration = [];
 
     #[ORM\ManyToOne(targetEntity: TaxCategoryInterface::class)]

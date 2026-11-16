@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    payment_method:
+        calculator:
+            unknown: 'Calculatorul de taxă {{ value }} nu există. Folosiți unul dintre: {{ choices }}.'
+        calculator_configuration:
+            channel_missing: 'Introduceți taxa pentru canalul {{ field }}.'
+            channel_unknown: 'Canalul {{ field }} nu există.'
+            country_unknown: 'Țara {{ field }} nu există.'
+            amount_not_blank: 'Introduceți valoarea taxei.'
+            amount_integer: 'Taxa trebuie să fie un număr întreg în cea mai mică unitate a monedei (de ex. 150 pentru 1,50).'
+            amount_negative: 'Taxa nu poate fi negativă.'
+            currency_not_blank: 'Alegeți moneda taxei.'
+            currency_unknown: 'Moneda {{ value }} nu există în magazin.'

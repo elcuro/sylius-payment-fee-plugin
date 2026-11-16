@@ -1,0 +1,13 @@
+elcuro_sylius_payment_fee:
+    payment_method:
+        calculator:
+            unknown: 'Kalkulačka poplatku {{ value }} neexistuje. Použite jednu z: {{ choices }}.'
+        calculator_configuration:
+            channel_missing: 'Zadajte poplatok pre kanál {{ field }}.'
+            channel_unknown: 'Kanál {{ field }} neexistuje.'
+            country_unknown: 'Krajina {{ field }} neexistuje.'
+            amount_not_blank: 'Zadajte výšku poplatku.'
+            amount_integer: 'Poplatok musí byť celé číslo v najmenšej jednotke meny (napr. 150 pre 1,50).'
+            amount_negative: 'Poplatok nemôže byť záporný.'
+            currency_not_blank: 'Vyberte menu poplatku.'
+            currency_unknown: 'Mena {{ value }} v obchode neexistuje.'

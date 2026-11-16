@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container
+        xmlns="http://symfony.com/schema/dic/services"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <service id="elcuro_sylius_payment_fee.validator.registered_calculator" class="Elcuro\SyliusPaymentFeePlugin\Validator\Constraints\RegisteredCalculatorValidator">
+            <argument type="service" id="elcuro_sylius_payment_fee.registry.calculator" />
+            <tag name="validator.constraint_validator" alias="elcuro_sylius_payment_fee.validator.registered_calculator" />
+        </service>
+
+        <service id="elcuro_sylius_payment_fee.validator.calculator_configuration" class="Elcuro\SyliusPaymentFeePlugin\Validator\Constraints\CalculatorConfigurationValidator">
+            <argument type="service" id="elcuro_sylius_payment_fee.registry.calculator" />
+            <argument type="service" id="sylius.repository.channel" />
+            <argument type="service" id="sylius.repository.country" />
+            <argument type="service" id="sylius.repository.currency" />
+            <tag name="validator.constraint_validator" alias="elcuro_sylius_payment_fee.validator.calculator_configuration" />
+        </service>
+    </services>
+</container>

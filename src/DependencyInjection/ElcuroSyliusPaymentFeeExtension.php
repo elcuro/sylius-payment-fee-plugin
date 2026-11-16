@@ -24,6 +24,28 @@ final class ElcuroSyliusPaymentFeeExtension extends AbstractResourceExtension im
     public function prepend(ContainerBuilder $container): void
     {
         $this->prependDoctrineMigrations($container);
+        $this->prependAdminApi($container);
+    }
+
+    /**
+     * Property descriptions (config/api_platform) and the serialization groups that put the fee
+     * fields into the core PaymentMethod resource (config/serialization). Hosts get them with the
+     * bundle; without API Platform there is nothing to register.
+     */
+    private function prependAdminApi(ContainerBuilder $container): void
+    {
+        if (!$container->hasExtension('api_platform')) {
+            return;
+        }
+
+        $configDir = dirname(__DIR__, 2) . '/config';
+
+        $container->prependExtensionConfig('api_platform', [
+            'mapping' => ['paths' => [$configDir . '/api_platform']],
+        ]);
+        $container->prependExtensionConfig('framework', [
+            'serializer' => ['mapping' => ['paths' => [$configDir . '/serialization']]],
+        ]);
     }
 
     protected function getMigrationsNamespace(): string

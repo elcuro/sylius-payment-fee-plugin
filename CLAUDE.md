@@ -4,10 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Sylius Payment Fee Plugin — adds configurable payment method fees to Sylius 2.0 e-commerce platform. Fees are calculated per payment method, applied as order adjustments, and support taxation.
+Sylius Payment Fee Plugin — adds configurable payment method fees to Sylius 2.3 e-commerce platform. Fees are calculated per payment method, applied as order adjustments, and support taxation.
 
 - **Namespace**: `Elcuro\SyliusPaymentFeePlugin`
-- **PHP**: ^8.2, **Sylius**: ^2.0
+- **PHP**: ^8.3, **Sylius**: ^2.3 (API Platform 5, Doctrine DBAL 4; the last Sylius 2.2 version is tag `v2.2.0`)
 - **Local dev**: DDEV (nginx + MariaDB 11.8 + PHP 8.4)
 
 ## Development Commands
@@ -36,13 +36,19 @@ vendor/bin/console assets:install
 
 ### Testing
 ```bash
-vendor/bin/phpunit                                                    # PHPUnit
-vendor/bin/behat --strict --tags="~@javascript&&~@mink:chromedriver"  # Behat (non-JS)
+vendor/bin/phpunit                                                    # PHPUnit: suites unit + functional
+vendor/bin/behat --strict --no-interaction --tags="~@javascript&&~@mink:chromedriver"  # Behat (non-JS)
 
 # JS scenarios require Chrome headless + symfony server on port 8080
 APP_ENV=test symfony server:start --port=8080 --daemon
 vendor/bin/behat --strict --tags="@javascript,@mink:chromedriver"
 ```
+
+Through `ddev exec`, quote the whole Behat command (`ddev exec 'vendor/bin/behat … --tags="…&&…"'`), otherwise the
+shell splits it at `&&`. After a new migration run it for the test DB too
+(`ddev exec "APP_ENV=test vendor/bin/console doctrine:migrations:migrate -n"`). `behat.yml.dist` imports the core
+suites from `suites.php` (Sylius 2.3 ships them as PHP). If a new validator message shows up untranslated in tests,
+delete `var/cache/test/translations` (a stale catalogue survives `cache:clear`).
 
 ### Code Quality
 ```bash
@@ -54,7 +60,7 @@ vendor/bin/ecs check                                      # Coding standards (Sy
 
 ### Plugin Structure
 - `src/ElcuroSyliusPaymentFeePlugin.php` — Bundle entry point using `SyliusPluginTrait`, registers `RegisterFeeCalculatorsPass` compiler pass
-- `src/DependencyInjection/ElcuroSyliusPaymentFeeExtension.php` — Loads `config/services.xml`, prepends Doctrine migrations
+- `src/DependencyInjection/ElcuroSyliusPaymentFeeExtension.php` — Loads `config/services.xml`, prepends Doctrine migrations and (with API Platform) the Admin API mapping paths
 - `config/services.xml` — Service definitions (XML format), imports from `config/services/`
 - `config/services/calculators.xml` — Fee calculator service definitions
 - `config/services/forms.xml` — Form type and extension definitions
@@ -76,7 +82,31 @@ vendor/bin/ecs check                                      # Coding standards (Sy
 ### Model
 - `src/Model/PaymentMethodWithFeeTrait.php` — Adds `calculator`, `calculatorConfiguration`, and `taxCategory` to PaymentMethod entity
 - `src/Model/PaymentMethodWithFeeInterface.php` — Interface for the trait
-- `src/Model/AdjustmentInterface.php` — Defines `PAYMENT_FEE_ADJUSTMENT` constant
+- `src/Model/AdjustmentInterface.php` — Defines `PAYMENT_ADJUSTMENT` (`payment`) adjustment type
+- Validation of the fee fields lives on the trait properties, not in the form types:
+  `src/Validator/Constraints/RegisteredCalculator` (name registered or null) and `CalculatorConfiguration`
+  (shape per calculator type: `flat_rate` = `{CHANNEL: {amount}}` for every channel, `country_rate` =
+  `{COUNTRY: {currency, amount}}`; amounts integer cents >= 0), validators in `config/services/validators.xml`,
+  messages in `translations/validators.*.yaml` (six languages). The form types carry no constraints, so the admin
+  shows each message once.
+
+### Migrations
+- `src/Migrations/Version20260311000000.php` — fee columns on `sylius_payment_method`
+- `src/Migrations/Version20261116000000.php` — drops the DBAL 3 `(DC2Type:json)` comment of
+  `calculator_configuration` (no-op where there is none); `doctrine:schema:update --dump-sql` then lists nothing on
+  `sylius_payment_method` (remaining lines are core: `sylius_payment_request`, `sylius_payment_security_token`,
+  `messenger_messages`). Needs `serverVersion=11.8.0-mariadb` in `DATABASE_URL` (test app `.env`): without it DBAL 4
+  assumes MySQL 5.7 and reports MariaDB JSON columns as changed for ever.
+
+### Admin API
+- Spec `etc/specs/admin-api.md`; README "Admin API". The fee fields join the **core** PaymentMethod resource (no own
+  resource): `config/serialization/PaymentMethod.xml` maps them on `PaymentMethodWithFeeInterface` into
+  `sylius:admin:payment_method:{index (calculator only),show,create,update}`; descriptions (and the `object` schema of
+  `calculatorConfiguration`) in `config/api_platform/properties/PaymentMethod.xml`. Both directories are registered by
+  `prependAdminApi()` in the extension when the `api_platform` extension exists.
+- Order fee adjustments (type `payment`) stay read-only (core `/admin/orders/{tokenValue}/adjustments`).
+- Functional tests `tests/Functional/Api/Admin/` (`AdminApiTestCase`: WebTestCase, `disableReboot()`, rolled-back
+  transaction, JWT of a fresh `ROLE_API_ACCESS` admin); `tests/bootstrap.php` loads the test app's env.
 
 ### Order Processing
 - `src/OrderProcessing/PaymentChargesProcessor.php` — Calculates and applies payment fee adjustments to orders (priority 15, i.e. before `OrderTaxesProcessor` at 10, so the tax applicator sees the gross fee)
@@ -120,7 +150,7 @@ The plugin runs inside `vendor/sylius/test-application` (installed via Composer)
 
 ### Testing Layers
 - **Behat**: `features/` (Gherkin) + `tests/Behat/` (contexts, pages, services)
-- **PHPUnit**: `tests/Unit/`, `tests/Integration/`, `tests/Functional/`
+- **PHPUnit**: `tests/Unit/` (suite `unit`), `tests/Functional/` (suite `functional`, boots the test app on the test DB; `phpunit.xml.dist` forces `APP_ENV=test`)
 - Behat suite config: `tests/Behat/Resources/suites.yml`
 
 ## AI Development Guides
